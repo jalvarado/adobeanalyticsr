@@ -7,22 +7,21 @@
 #'
 #' @export
 aa_get_metrics <- function(rsid = Sys.getenv("AA_RSID"),
-                              locale = 'en_US',
-                              segmentable = 'false',
-                              expansion = c('tags', 'allowedForReporting', 'categories')){
+                           locale = 'en_US',
+                           segmentable = 'false',
+                           expansion = c('tags', 'allowedForReporting', 'categories')){
   #create the url to send with the query
 
   urlstructure <- sprintf(rsid,locale,segmentable)
 
   #&segmentable=%s&reportable=%s&classifiable=%s
 
+  res <- aa_get_data(req_path = urlstructure)
 
+  res <- jsonlite::fromJSON(res)
 
-  res <- aa_get_elements(req_path = urlstructure)
-
-  res <- fromJSON(res)
-# removing "metrics/" from the beginning of the id value
-  res$id <- stringr::str_sub(res$id, 9)
+  # removing "metrics/" from the beginning of the id value
+  res$id <- gsub("^metrics/","",res$id)
 
   res
 }

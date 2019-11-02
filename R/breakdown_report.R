@@ -8,8 +8,8 @@
 #'
 
 #' @export
-#' @import assertthat httr tidyverse
-#'
+#' @import assertthat httr purrr dplyr tidyr
+#' @importFrom jsonlite fromJSON
 aa_breakdown_report <- function(date_range,
                              metrics,
                              dimensions,
@@ -54,11 +54,11 @@ aa_breakdown_report <- function(date_range,
   # If more than one metric the value list needs to be spread to individual columns
   if(length(metrics) > 1 ) {
     res_df <- res_df %>%
-      unnest(data) %>%
-      group_by(itemId, value) %>%
-      mutate(col = seq_along(data)) %>%
-      spread(key=col, value=data) %>%
-      arrange(desc(`1`) )
+      tidyr::unnest(data) %>%
+      dplyr::group_by(itemId, value) %>%
+      dplyr::mutate(col = seq_along(data)) %>%
+      tidyr::spread(key=col, value=data) %>%
+      dplyr::arrange(desc(`1`) )
   }
 
   # Add column names to the dataset based on the metrics and dimensions
@@ -72,7 +72,10 @@ aa_breakdown_report <- function(date_range,
       #new list for building the metricFilter list
       metric_with_filter <- purrr::pmap(metrics_information,addmetricsfilters)
 
-      metric_filters <- list(id = 0, type = 'breakdown', dimension = dimensions[1], itemId = itemids)
+      metric_filters <- list(id = 0,
+                             type = 'breakdown',
+                             dimension = dimensions[1],
+                             itemId = itemids)
 
       dims <- purrr::pmap(metric_filters, breakdowns)
 
@@ -97,7 +100,7 @@ aa_breakdown_report <- function(date_range,
 
       res2 <- aa_get_data("reports/ranked", body = req_body)
 
-      res2 <- fromJSON(res2, flatten = TRUE )
+      res2 <- jsonlite::fromJSON(res2, flatten = TRUE )
 
       # Clean up and return as data frame
       res_df2 <- res2$rows
@@ -105,15 +108,15 @@ aa_breakdown_report <- function(date_range,
       # If more than one metric the value list needs to be spread to individual columns
       if(length(metrics) > 1 ) {
         res_df2 <- res_df2 %>%
-          unnest(data) %>%
-          group_by(itemId,value) %>%
-          mutate(col = seq_along(data)) %>%
-          spread(key=col, value=data)
+          tidyr::unnest(data) %>%
+          dplyr::group_by(itemId,value) %>%
+          dplyr::mutate(col = seq_along(data)) %>%
+          tidyr::spread(key=col, value=data)
       }
 
   # Add column names to the dataset based on the metrics and dimensions
   #colnames(res_df2) <- c('id',dimensions[1],dimensions[2],metrics)
-    return(res_df2)
+  res_df2
 
 }
 

@@ -8,7 +8,7 @@
 #'
 
 #' @export
-#' @import assertthat httr tidyverse
+#' @import assertthat httr purrr tidyr dplyr jsonlite
 #'
 aa_ranked_report <- function(date_range,
                               metrics,
@@ -47,7 +47,7 @@ aa_ranked_report <- function(date_range,
 
   res <- aa_get_data("reports/ranked", body = req_body)
 
-  res <- fromJSON(res)
+  res <- jsonlite::fromJSON(res)
 
   # Clean up and return as data frame
   res_df <- res$rows

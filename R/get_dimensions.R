@@ -17,17 +17,16 @@ aa_get_dimensions <- function(rsid = Sys.getenv("AA_RSID"),
   #create the url to send with the query
 
   urlstructure <- sprintf("dimensions?rsid=%s&locale=%s",
-                 rsid,locale)
+                          rsid,locale)
 
   #&segmentable=%s&reportable=%s&classifiable=%s
 
+  res <- aa_get_data(req_path = urlstructure)
 
+  res <- jsonlite::fromJSON(res)
 
-  res <- aa_get_elements(req_path = urlstructure)
-
-  res <- fromJSON(res)
   # removing "metrics/" from the beginning of the id value
-  res$id <- stringr::str_sub(res$id, 11)
+  res$id <- gsub("^metrics/","",res$id)
 
   res
 }

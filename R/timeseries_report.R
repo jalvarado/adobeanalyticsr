@@ -9,6 +9,8 @@
 #' @param rsid Adobe report number
 #'
 #' @export
+#' @importFrom jsonlite fromJSON
+#' @importFrom purrr map2
 aa_timeseries_report <- function(date_range,
                                  metrics,
                                  top = 50,
@@ -51,7 +53,7 @@ aa_timeseries_report <- function(date_range,
 
   # Clean up and return as data frame
   res_df <- res$rows
-  res_df <- as.data.frame(matrix(unlist(res_df), nrow= length(res_df), byrow = T))
+  res_df <- as.data.frame(matrix(unlist(res_df), nrow= length(res_df), byrow = TRUE))
 
   # Add column names to the dataset based on the metrics and dimensions
   colnames(res_df) <- c('id',granularity,metrics)
