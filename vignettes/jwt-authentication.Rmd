@@ -1,0 +1,43 @@
+---
+title: "Jason Web Token (JWT) Authentication"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{jwt-authentication}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette goes through the basics of using a JSON web token (JWT) to authenticate with the Aodbe Analytics API V2.0.
+
+# Pre-requisites: Service Account Integration
+
+In order to use the JWT authentication flow, you will need to create a Service Account Integration in the Adobe I/O Console. Instructions for how to create the required integration can be found in the Adobe Analytics documentation [here](https://www.adobe.io/apis/experienceplatform/console/docs.html#!AdobeDocs/adobeio-console/master/services-add-api-jwt.md).
+
+# Authenticating with the JWT flow
+
+The JWT authentication flow requires two things in order to complete the authentication process:
+
+1.  A config file containing the Service Account Integration details
+
+-   Client Id
+-   Client Secret
+-   Technical Account Id
+-   Organizational Id
+
+2.  The private key corresponding to the public key cert that was generated during the creation of the Service Account Integration.
+
+By default, the JWT authentication flow will look for two environment variables (`AW_JWT_CONFIG_FILE` and `AW_JWT_PRIVATE_KEY_FILE`) which should be set with the paths to the Service Account Integration config file and the private key file respectively. If you do not wish to provide these values through the environment variables, they may be passed as arguments to the JWT authentication method:
+
+``` {.r}
+config_file_path <- "path/to/config_file"
+key_file_path <- "path/to/key_file"
+
+auth_jwt( config_file = config_file_path, key_file = key_file_path )
+```
