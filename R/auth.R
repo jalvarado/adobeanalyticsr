@@ -36,3 +36,11 @@ aw_token <- function(client_id = Sys.getenv("AW_CLIENT_ID"),
     oob_value = "https://adobeanalyticsr.com/token_result.html"
   )
 }
+
+auth_options <- function(...) {
+  if (.AAEnv$AuthMethod == "jwt") {
+    return(httr::add_headers(Authorization = paste("Bearer", auth_jwt())))
+  } else {
+    return(httr::config(token = aw_token(...)))
+  }
+}

@@ -23,9 +23,6 @@ get_me <- function(req_path = 'discovery/me',
     is.string(client_secret)
   )
 
-  # creates token to aa.oauth if not present
-  token <- aw_token(client_id, client_secret)
-
   request_url <- sprintf("https://analytics.adobe.io/%s",
                           req_path)
 
@@ -33,7 +30,7 @@ get_me <- function(req_path = 'discovery/me',
                      url = request_url,
                      encode = "json",
                      body = FALSE,
-                     config(token = token),
+                     auth_options(),
                      httr::add_headers(
                        `x-api-key` = client_id
                      ))

@@ -27,7 +27,7 @@ aw_workspace_report <- function(req_body = '',
   )
 
   # creates token to aa.oauth if not present
-  token <- aw_token(client_id, client_secret)
+  # token <- aw_token(client_id, client_secret)
 
   #grab the dimensions and metric names from the query
   query <-jsonlite::fromJSON(txt=req_body)
@@ -68,7 +68,7 @@ aw_workspace_report <- function(req_body = '',
                      url = request_url,
                      body = upload_file(req_body),
                      encode = "json",
-                     config(token = token),
+                     auth_options(client_id, client_secret),
                      httr::add_headers(
                        `x-api-key` = client_id,
                        `x-proxy-global-company-id` = company_id

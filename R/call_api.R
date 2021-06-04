@@ -36,7 +36,7 @@ aw_call_api <- function(req_path,
   )
 
   # creates token to aa.oauth if not present
-  token <- aw_token(client_id, client_secret, use_oob = use_oob)
+  # token <- aw_token(client_id, client_secret, use_oob = use_oob)
 
   request_url <- sprintf("https://analytics.adobe.io/api/%s/%s",
                          company_id, req_path)
@@ -46,7 +46,7 @@ aw_call_api <- function(req_path,
                      url = request_url,
                      encode = "json",
                      body = FALSE,
-                     httr::config(token = token),
+                     auth_options(client_id, client_secret, use_oob = use_oob),
                      httr::add_headers(
                        `x-api-key` = client_id,
                        `x-proxy-global-company-id` = company_id
@@ -57,7 +57,7 @@ aw_call_api <- function(req_path,
                        url = request_url,
                        encode = "json",
                        body = FALSE,
-                       httr::config(token = token),
+                       auth_options(client_id, client_secret, use_oob = use_oob),
                        httr::verbose(data_out = TRUE, data_in = TRUE, info = TRUE),
                        httr::add_headers(
                          `x-api-key` = client_id,
