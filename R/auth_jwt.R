@@ -1,19 +1,3 @@
-# This code is executed in the package environment
-.AAEnv <- new.env(parent = emptyenv())
-.AAEnv$Token <- NULL
-.AAEnv$AuthMethod <- "oauth"
-
-# Set token to environment
-set_token <- function(value) {
-  .AAEnv$Token <- value
-  return(value)
-}
-
-# Get token from environment
-get_token <- function() {
-  .AAEnv$Token
-}
-
 #' Authenticate with the AdobeAnalytics API V2.0 using JWT
 #'
 #' @param config_file path to the JWT interface configuration JSON file.
@@ -56,9 +40,9 @@ auth_jwt <- function(config_file = Sys.getenv("AW_JWT_CONFIG_FILE"),
                       ims_exchange = "https://ims-na1.adobelogin.com/ims/exchange/jwt",
                       config = adobe_config)
 
-  .AAEnv$AuthMethod <- "jwt"
+  set_auth_method("jwt")
   set_token(token)
-  message("Authentication successful! You can now make API calls.")
+  message("Authentication successful! You can now make API calls using a JWT.")
 }
 
 #' Create a JWT which can ben exchanged with the AdobeAnalytics API V2.0 for an
