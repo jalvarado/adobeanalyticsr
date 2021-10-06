@@ -14,14 +14,13 @@
 #' @import httr
 auth_jwt <- function(config_file = Sys.getenv("AW_JWT_CONFIG_FILE"),
                      key_file = Sys.getenv("AW_JWT_PRIVATE_KEY_FILE")) {
-
   assertthat::assert_that(
     assertthat::is.string(config_file),
     assertthat::is.string(key_file)
   )
 
-  token <- get_token()
-  if(!is.null(token)) {
+  token <- adobeanalyticsr::get_token()
+  if (!is.null(token)) {
     return(token)
   }
 
@@ -36,12 +35,14 @@ auth_jwt <- function(config_file = Sys.getenv("AW_JWT_CONFIG_FILE"),
   # Create the JWT
   jwt <- get_jwt(adobe_config, key_file)
 
-  token <- exchange_jwt(jwt = jwt,
-                      ims_exchange = "https://ims-na1.adobelogin.com/ims/exchange/jwt",
-                      config = adobe_config)
+  token <- exchange_jwt(
+    jwt = jwt,
+    ims_exchange = "https://ims-na1.adobelogin.com/ims/exchange/jwt",
+    config = adobe_config
+  )
 
-  set_auth_method("jwt")
-  set_token(token)
+  adobeanalyticsr::set_auth_method("jwt")
+  adobeanalyticsr::set_token(token)
   message("Authentication successful! You can now make API calls using a JWT.")
 }
 
@@ -50,15 +51,15 @@ auth_jwt <- function(config_file = Sys.getenv("AW_JWT_CONFIG_FILE"),
 #'
 #' @keywords internal
 #'
-#' @param config list containing the JWT integration settings downloaded from the
-#'               Adobe I/O Console.
-#' @param key_file path to the RSA private key which will be used to sign the JWT
+#' @param config list containing the JWT integration settings downloaded from
+#'               the Adobe I/O Console.
+#' @param key_file path to the RSA private key which will be used to sign
+#'               the JWT
 #'
 #' @return jwt A signed JWT encoded as a Base64 string
 #'
 get_jwt <- function(config,
-                    key_file
-) {
+                    key_file) {
   private_key <- openssl::read_key(key_file)
   # Create the JWT payload
   claim <- jose::jwt_claim(
@@ -77,15 +78,19 @@ exchange_jwt <- function(jwt,
                          ims_exchange,
                          config) {
   message("Exchanging JWT for Auth token...")
-  post_body <- list(client_id = config$API_KEY,
-                    client_secret = config$CLIENT_SECRET,
-                    jwt_token = jwt)
+  post_body <- list(
+    client_id = config$API_KEY,
+    client_secret = config$CLIENT_SECRET,
+    jwt_token = jwt
+  )
 
-  r <- httr::POST(url = ims_exchange,
-                  body = post_body,
-                  encode = "form")
-  stop_for_status(r)
-  responseJson <- jsonlite::fromJSON(httr::content(r, as = "text"))
+  r <- httr::POST(
+    url = ims_exchange,
+    body = post_body,
+    encode = "form"
+  )
+  adobeanalyticsr::stop_for_status(r)
+  response_json <- jsonlite::fromJSON(httr::content(r, as = "text"))
 
-  return(responseJson$access_token)
+  return(response_json$access_token)
 }

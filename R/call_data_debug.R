@@ -13,14 +13,13 @@
 #'
 #' @import assertthat httr purrr
 #'
-####Sunsetting this function for a better function if statement for easier maintenance###
+#### Sunsetting this function for a better function if statement for easier maintenance###
 aw_call_data_debug <- function(req_path,
-                        body = NULL,
-                        company_id = Sys.getenv("AW_COMPANY_ID"),
-                        client_id = Sys.getenv("AW_CLIENT_ID"),
-                        client_secret = Sys.getenv("AW_CLIENT_SECRET"),
-                        debug = TRUE){
-
+                               body = NULL,
+                               company_id = Sys.getenv("AW_COMPANY_ID"),
+                               client_id = Sys.getenv("AW_CLIENT_ID"),
+                               client_secret = Sys.getenv("AW_CLIENT_SECRET"),
+                               debug = TRUE) {
   assert_that(
     is.string(req_path),
     is.list(body),
@@ -29,30 +28,29 @@ aw_call_data_debug <- function(req_path,
     is.string(client_secret)
   )
 
-  # creates token to aa.oauth if not present
-  # token <- aw_token(client_id, client_secret)
-
-  request_url <- sprintf("https://analytics.adobe.io/api/%s/%s",
-                         company_id, req_path)
+  request_url <- sprintf(
+    "https://analytics.adobe.io/api/%s/%s",
+    company_id, req_path
+  )
 
   req <- httr::RETRY("POST",
-                     url = request_url,
-                     body = body,
-                     encode = "json",
-                     auth_options(client_id, client_secret),
-                     httr::verbose(data_out = debug),
-                     httr::add_headers(
-                       `x-api-key` = client_id,
-                       `x-proxy-global-company-id` = company_id
-                     ))
+    url = request_url,
+    body = body,
+    encode = "json",
+    auth_options(client_id, client_secret),
+    httr::verbose(data_out = debug),
+    httr::add_headers(
+      `x-api-key` = client_id,
+      `x-proxy-global-company-id` = company_id
+    )
+  )
 
   stop_for_status(req)
 
-  if(status_code(req) == 206  & length(content(req)$columns$columnErrors[[1]]) != 0) {
-    stop(paste0('The error code is ',content(req)$columns$columnErrors[[1]]$errorCode,' - ',content(req)$columns$columnErrors[[1]]$errorDescription))
-  } else if(status_code(req) == 206) {
-    stop(paste0('Please check the metrics your requested. A 206 error was returned.'))
+  if (status_code(req) == 206 & length(content(req)$columns$columnErrors[[1]]) != 0) {
+    stop(paste0("The error code is ", content(req)$columns$columnErrors[[1]]$errorCode, " - ", content(req)$columns$columnErrors[[1]]$errorDescription))
+  } else if (status_code(req) == 206) {
+    stop(paste0("Please check the metrics your requested. A 206 error was returned."))
   }
-  httr::content(req, as = "text",encoding = "UTF-8")
+  httr::content(req, as = "text", encoding = "UTF-8")
 }
-

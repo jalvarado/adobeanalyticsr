@@ -13,25 +13,22 @@
 #' @param use_oob Always set to TRUE. Needed for tests
 #'
 #' @examples
-#'
 #' \dontrun{
 #'
 #' aw_call_data("reports/ranked",
-#'             body = list(..etc..),
-#'             company_id = "blah")
-#'
+#'   body = list(..etc..),
+#'   company_id = "blah"
+#' )
 #' }
 #' @import assertthat httr purrr
 #'
 aw_call_data <- function(req_path,
-                        body = NULL,
-                        debug = FALSE,
-                        company_id = Sys.getenv("AW_COMPANY_ID"),
-                        client_id = Sys.getenv("AW_CLIENT_ID"),
-                        client_secret = Sys.getenv("AW_CLIENT_SECRET"),
-                        use_oob = TRUE
-                        ){
-
+                         body = NULL,
+                         debug = FALSE,
+                         company_id = Sys.getenv("AW_COMPANY_ID"),
+                         client_id = Sys.getenv("AW_CLIENT_ID"),
+                         client_secret = Sys.getenv("AW_CLIENT_SECRET"),
+                         use_oob = TRUE) {
   assert_that(
     is.string(req_path),
     is.list(body),
@@ -40,40 +37,41 @@ aw_call_data <- function(req_path,
     is.string(client_secret)
   )
 
-  # creates token to aa.oauth if not present
-  # token <- aw_token(client_id, client_secret, use_oob = use_oob)
-
-  request_url <- sprintf("https://analytics.adobe.io/api/%s/%s",
-                         company_id, req_path)
-  if(debug == F) {
-  req <- httr::RETRY("POST",
-                     url = request_url,
-                     body = body,
-                     encode = "json",
-                     auth_options(client_id, client_secret, use_oob = use_oob),
-                     httr::add_headers(
-                       `x-api-key` = client_id,
-                       `x-proxy-global-company-id` = company_id
-                     ))
-  }
-  if(debug == T) {
+  request_url <- sprintf(
+    "https://analytics.adobe.io/api/%s/%s",
+    company_id, req_path
+  )
+  if (debug == F) {
     req <- httr::RETRY("POST",
-                       url = request_url,
-                       body = body,
-                       encode = "json",
-                       auth_options(client_id, client_secret, use_oob = use_oob),
-                       httr::verbose(data_out = debug),
-                       httr::add_headers(
-                         `x-api-key` = client_id,
-                         `x-proxy-global-company-id` = company_id
-                       ))
+      url = request_url,
+      body = body,
+      encode = "json",
+      auth_options(client_id, client_secret, use_oob = use_oob),
+      httr::add_headers(
+        `x-api-key` = client_id,
+        `x-proxy-global-company-id` = company_id
+      )
+    )
+  }
+  if (debug == T) {
+    req <- httr::RETRY("POST",
+      url = request_url,
+      body = body,
+      encode = "json",
+      auth_options(client_id, client_secret, use_oob = use_oob),
+      httr::verbose(data_out = debug),
+      httr::add_headers(
+        `x-api-key` = client_id,
+        `x-proxy-global-company-id` = company_id
+      )
+    )
   }
   stop_for_status(req)
 
-  if(status_code(req) == 206  & length(content(req)$columns$columnErrors[[1]]) != 0) {
-    stop(paste0('The error code is ',content(req)$columns$columnErrors[[1]]$errorCode,' - ',content(req)$columns$columnErrors[[1]]$errorDescription))
-  } else if(status_code(req) == 206) {
-    stop(paste0('Please check the metrics your requested. A 206 error was returned.'))
+  if (status_code(req) == 206 & length(content(req)$columns$columnErrors[[1]]) != 0) {
+    stop(paste0("The error code is ", content(req)$columns$columnErrors[[1]]$errorCode, " - ", content(req)$columns$columnErrors[[1]]$errorDescription))
+  } else if (status_code(req) == 206) {
+    stop(paste0("Please check the metrics your requested. A 206 error was returned."))
   }
-  httr::content(req, as = "text",encoding = "UTF-8")
+  httr::content(req, as = "text", encoding = "UTF-8")
 }
