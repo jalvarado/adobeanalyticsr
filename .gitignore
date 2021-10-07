@@ -16,6 +16,7 @@
 
 # RStudio files
 .Rproj.user/
+*.code-workspace
 
 # produced vignettes
 vignettes/*.html
@@ -48,3 +49,4 @@ Meta
 
 #CRAN comments
 cran-comments.md
+
